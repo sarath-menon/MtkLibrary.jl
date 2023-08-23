@@ -1,7 +1,7 @@
 export BldcMotorPropellerPair, selva
 
 
-function BldcMotorPropellerPair(; name, τ)
+function BldcMotorPropellerPair(; name)
 
     # translation
     @variables t thrust_cmd(t) = 0 thrust_output(t) = 0

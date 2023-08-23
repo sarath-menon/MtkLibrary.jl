@@ -12,7 +12,7 @@ using Test
 
 # initialize subsystems
 @named reference = Step(start_time=1)
-@named motor = BldcMotorPropellerPair(; name=:motor, τ=0.02)
+@named motor = BldcMotorPropellerPair(; name=:motor)
 
 # build system
 eqns = [reference.output.u ~ motor.thrust_cmd]
@@ -20,7 +20,13 @@ sys = structural_simplify(ODESystem(eqns, t, systems=[reference, motor], name=:s
 
 # simulation
 tspan = (0.0, 4.0)
-prob = ODEProblem(sys, [], tspan)
+params = [
+    motor.first_order_system => 0.02,
+]
+
+parameters(sys)
+
+prob = ODEProblem(sys, [], tspan, params)
 @time sol = solve(prob, Tsit5(), abstol=1e-8, reltol=1e-8)
 
 # plotting
