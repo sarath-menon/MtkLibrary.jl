@@ -3,6 +3,9 @@ uuid = "a0ce3b87-3962-4a0a-8f14-cd2409246f96"
 authors = ["Sarath Suresh"]
 version = "1.0.0-DEV"
 
+[deps]
+ModelingToolkitStandardLibrary = "16a59e39-deab-5bd0-87e4-056b12336739"
+
 [compat]
 julia = "1.9.2"
 
