@@ -1,5 +1,6 @@
 module MtkLibrary
 
+using Revise
 using ModelingToolkit
 using ModelingToolkitStandardLibrary.Blocks: SecondOrder, FirstOrder
 

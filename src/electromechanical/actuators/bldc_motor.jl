@@ -1,21 +1,17 @@
-export BldcMotorPropellerPair
+export BldcMotorPropellerPair, selva
 
 
 function BldcMotorPropellerPair(; name, τ)
 
     # translation
-    @variables t thrust_cmd(t) = 0
+    @variables t thrust_cmd(t) = 0 thrust_output(t) = 0
 
-    @parameters τ = τ
+    @named first_order_system = FirstOrder(k=1.0, T=τ)
 
-    @named system = FirstOrder(k=1.0, T=0.02)
+    eqns = [thrust_cmd ~ first_order_system.u,
+        thrust_output ~ first_order_system.y]
 
-    connections = [
-        connect(thrust_cmd, system.input)
-    ]
-
-    ODESystem(connections, t, systems=[system]; name)
-
-    # sys = structural_simplify(model);
-
+    ODESystem(eqns, t, systems=[first_order_system]; name)
 end
+
+selva() = print("ok")
