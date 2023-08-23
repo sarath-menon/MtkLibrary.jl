@@ -1,38 +1,43 @@
-export RigidBody
+
+module RigidBodyTest
+
+using MtkLibrary
+using ModelingToolkit
+using OrdinaryDiffEq
+using GLMakie
+using Test
+
+@variables t
 
 
-function RigidBody(; name, m, I_xx, I_yy, I_zz)
+@named rb = RigidBody(; name=:rb)
 
-    # translation
-    @variables t (r(t))[1:3] = 0 (ṙ(t))[1:3] = 0
+# build system
+thrust_eqn = rb.f .~ [0; 0; 1.5]
+torque_eqn = rb.τ .~ [0; 0; 0]
 
-    # rotation
-    @variables (q(t))[1:4] = 0 (ω(t))[1:3] = 0
+eqns = vcat(thrust_eqn, torque_eqn)
 
-    # external force, torque
-    @variables (f(t))[1:3] = 0 (τ(t))[1:3]
+@named model = ODESystem(eqns, systems=[rb])
+sys = structural_simplify(model)
 
-    @parameters m = m I_xx = I_xx I_yy = I_yy I_zz = I_yy
+# simulation
+tspan = (0.0, 4.0)
+params = [
+    rb.m => 1.0,
+    rb.I_xx => 0.2,
+    rb.I_yy => 0.2,
+    rb.I_zz => 0.4,
+]
 
-    D = Differential(t)
+ModelingToolkit.get_ps(sys)
 
-    translational_kinematics = D.(r) .~ ṙ
 
-    translational_dynamics = D.(ṙ) .~ f / m
+prob = ODEProblem(sys, [], tspan, params)
+@time sol = solve(prob, Tsit5(), abstol=1e-8, reltol=1e-8)
 
-    rotation_kinematics = D.(q) .~ 0  # implemented in callback
 
-    rotation_dynamics = [
-        D.(ω[1]) .~ (τ[1] - (I_yy - I_zz) * ω[2] * ω[3]) / I_xx,
-        D.(ω[2]) .~ (τ[2] - (I_xx - I_zz) * ω[1] * ω[3]) / I_yy,
-        D.(ω[3]) .~ (τ[3] - (I_yy - I_xx) * ω[1] * ω[2]) / I_zz,
-    ]
-
-    # eqns = vcat(translational_kinematics,translational_dynamics, rotation_kinematics, rotation_dynamics, external_force ,external_torque)
-    eqns = vcat(translational_kinematics, translational_dynamics, rotation_kinematics, rotation_dynamics)
-
-    ODESystem(eqns, t; name)
-
-    # sys = structural_simplify(model);
+# plotting
+# lines(sol.t, sol[motor.thrust_output])
 
 end

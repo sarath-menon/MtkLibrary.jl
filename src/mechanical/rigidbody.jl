@@ -12,7 +12,7 @@ function RigidBody(; name)
     # external force, torque
     @variables (f(t))[1:3] = 0 (τ(t))[1:3]
 
-    @parameters m = m I_xx = I_xx I_yy = I_yy I_zz = I_yy
+    @parameters m I_xx I_yy I_zz
 
     D = Differential(t)
 
