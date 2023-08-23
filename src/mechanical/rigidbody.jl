@@ -1,7 +1,7 @@
 export RigidBody
 
 
-function RigidBody(; name, m, I_xx, I_yy, I_zz)
+function RigidBody(; name)
 
     # translation
     @variables t (r(t))[1:3] = 0 (ṙ(t))[1:3] = 0
